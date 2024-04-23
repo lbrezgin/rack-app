@@ -1,57 +1,48 @@
+require_relative 'time_formatter'
 class App
-
-  def initialize
-    @formats = {
-      "year" => "%Y",
-      "month" => "%m",
-      "day" => "%d",
-      "hour" => "%k",
-      "minute" => "%M",
-      "second" => "%S"
-    }
-  end
-
   def call(env)
     req = Rack::Request.new(env)
     format = req.params["format"]
+
     if req.path_info == "/time" && format
-      new_format = format.split(",")
-      if bad_format(new_format).empty?
-        [
-          200,
-          { 'Content-Type' => 'text/plain' },
-          [time_format(new_format)]
-        ]
+      time_formatter = TimeFormatter.new(format)
+      if time_formatter.time_format[0].empty?
+        give_time(time_formatter)
       else
-        [
-          400,
-          { 'Content-Type' => 'text/plain' },
-          ["Unknown time format #{bad_format(new_format)}"]
-        ]
+        format_error(time_formatter)
       end
     else
-      [
-        404,
-        { 'Content-Type' => 'text/plain' },
-        ["Error!\n"]
-      ]
+      request_error
     end
   end
 
   private
 
-  def bad_format(format)
-    format.reject { |form| form if @formats.keys.include?(form) }
+  def give_time(time_formatter)
+    [
+      200,
+      { 'Content-Type' => 'text/plain' },
+      [time_formatter.time_format[1]]
+    ]
   end
 
-  def time_format(format)
-    string = ""
-    format.each do |form|
-      string += @formats[form] + "-"
-    end
-    Time.now.strftime(string[0..-2])
+  def format_error(time_formatter)
+    [
+      400,
+      { 'Content-Type' => 'text/plain' },
+      ["Unknown time format #{time_formatter.time_format[0]}"]
+    ]
+  end
+
+  def request_error
+    [
+      404,
+      { 'Content-Type' => 'text/plain' },
+      ["Error!\n"]
+    ]
   end
 end
+
 
 
 
