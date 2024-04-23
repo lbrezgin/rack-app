@@ -5,43 +5,28 @@ class App
     format = req.params["format"]
 
     if req.path_info == "/time" && format
-      time_formatter = TimeFormatter.new(format)
-      if time_formatter.time_format[0].empty?
-        give_time(time_formatter)
+      time_response = TimeFormatter.new(format)
+      if time_response.success?
+        response(200, time_response.time_string)
       else
-        format_error(time_formatter)
+        response(400, "Unknown time format #{time_response.error_string}")
       end
     else
-      request_error
+      response(404, "Error!\n")
     end
   end
 
   private
 
-  def give_time(time_formatter)
+  def response(status, response_body)
     [
-      200,
+      status,
       { 'Content-Type' => 'text/plain' },
-      [time_formatter.time_format[1]]
-    ]
-  end
-
-  def format_error(time_formatter)
-    [
-      400,
-      { 'Content-Type' => 'text/plain' },
-      ["Unknown time format #{time_formatter.time_format[0]}"]
-    ]
-  end
-
-  def request_error
-    [
-      404,
-      { 'Content-Type' => 'text/plain' },
-      ["Error!\n"]
+      [response_body]
     ]
   end
 end
+
 
 
 

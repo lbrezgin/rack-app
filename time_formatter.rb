@@ -1,20 +1,26 @@
 class TimeFormatter
 
-  attr_reader :formats, :format
+  attr_reader :formats, :format, :time_string, :error_string
 
   def initialize(format)
     @formats = {
       "year" => "%Y",
       "month" => "%m",
       "day" => "%d",
-      "hour" => "%k",
+      "hour" => "%H",
       "minute" => "%M",
       "second" => "%S"
     }
     @format = format.split(",")
+    format_time
   end
 
-  def time_format
+  def success?
+    error_string.empty?
+  end
+
+  private
+  def format_time
     string = ""
     errors = []
     format.each do |form|
@@ -24,7 +30,8 @@ class TimeFormatter
         errors.push(form)
       end
     end
-    [errors, Time.now.strftime(string[0..-2])]
+    @time_string = Time.now.strftime(string[0..-2])
+    @error_string = errors
   end
 end
 
