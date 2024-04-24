@@ -12,14 +12,12 @@ class TimeFormatter
       "second" => "%S"
     }
     @format = format.split(",")
-    format_time
   end
 
   def success?
     error_string.empty?
   end
 
-  private
   def format_time
     string = ""
     errors = []
@@ -30,8 +28,8 @@ class TimeFormatter
         errors.push(form)
       end
     end
-    @time_string = Time.now.strftime(string[0..-2])
     @error_string = errors
+    @time_string = Time.now.strftime(string[0..-2]) if error_string.empty?
   end
 end
 

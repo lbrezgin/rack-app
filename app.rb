@@ -6,6 +6,7 @@ class App
 
     if req.path_info == "/time" && format
       time_response = TimeFormatter.new(format)
+      time_response.format_time
       if time_response.success?
         response(200, time_response.time_string)
       else
